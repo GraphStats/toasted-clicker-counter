@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Compteur Odometer</title>
+  <title>Comparateur de compteurs</title>
 
   <!-- Roboto Black -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
@@ -17,48 +17,99 @@
       background-color: #121212;
       color: #fff;
       text-align: center;
-      margin-top: 15vh;
+      padding: 5vh 2vw;
+    }
+
+    .counters {
+     font-family: 'Roboto' !important;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+
+    .counter-block {
+        font-family: 'Roboto' !important;
+      text-align: center;
     }
 
     .odometer {
-      font-family: 'Roboto' !important;
-      font-size: 13rem;
+        font-family: 'Roboto' !important;
+      font-size: 10em;
       font-weight: 900;
       color: #ffffff;
     }
 
-    h1 {
-      font-weight: 900;
-      font-size: 2rem;
-      margin-bottom: 30px;
+    .label {
+        font-family: 'Roboto' !important;
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    #difference-block {
+        font-family: 'Roboto' !important;
+      margin-top: 50px;
+    }
+
+    #difference {
+        font-family: 'Roboto' !important;
+      font-size: 7em;
+      color: #ffffff;
     }
   </style>
 </head>
 <body>
 
-  <div id="counter" class="odometer">0</div>
+
+  <div class="counters">
+    <div class="counter-block">
+      <div id="clicker" class="odometer">0</div>
+      <div class="label">Clicker.toasted.dev</div>
+    </div>
+    <div class="counter-block">
+      <div id="communitrics" class="odometer">0</div>
+      <div class="label">Communitrics.com</div>
+    </div>
+  </div>
+
+  <div id="difference-block" class="counter-block">
+    <div id="difference" class="odometer">0</div>
+  </div>
 
   <!-- Odometer JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
 
   <script>
-    const counter = document.getElementById("counter");
+    const clickerElem = document.getElementById("clicker");
+    const communitricsElem = document.getElementById("communitrics");
+    const differenceElem = document.getElementById("difference");
 
-    async function updateCounter() {
+    async function updateCounters() {
       try {
-        const response = await fetch("https://clicker.toasted.dev/api/clicks");
-        const data = await response.json();
-        counter.innerText = data.clicks;
+        const [clickerRes, communitricsRes] = await Promise.all([
+          fetch("https://clicker.toasted.dev/api/clicks"),
+          fetch("https://api.communitrics.com/counter")
+        ]);
+
+        const clickerData = await clickerRes.json();
+        const communitricsData = await communitricsRes.json();
+
+        const clickerCount = clickerData.clicks || 0;
+        const communitricsCount = communitricsData.count || 0;
+        const diff = Math.abs(clickerCount - communitricsCount);
+
+        clickerElem.innerText = clickerCount;
+        communitricsElem.innerText = communitricsCount;
+        differenceElem.innerText = diff;
+
       } catch (error) {
-        console.error("Erreur lors de la récupération des clics :", error);
+        console.error("Erreur lors de la récupération des données :", error);
       }
     }
 
-    // Mise à jour initiale
-    updateCounter();
-
-    // Mise à jour toutes les 2 secondes
-    setInterval(updateCounter, 2000);
+    updateCounters();
+    setInterval(updateCounters, 2000);
   </script>
 
 </body>
