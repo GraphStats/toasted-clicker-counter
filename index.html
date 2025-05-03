@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compteur Odometer</title>
+
+  <!-- Roboto Black depuis Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+
+  <!-- Odometer CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-default.min.css" />
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      text-align: center;
+      margin-top: 15vh;
+    }
+
+    .odometer {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #00ffae;
+    }
+
+    h1 {
+      font-weight: 900;
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Nombre de clics :</h1>
+  <div id="counter" class="odometer">0</div>
+
+  <!-- Odometer JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
+
+  <script>
+    async function updateCounter() {
+      try {
+        const response = await fetch("https://clicker.toasted.dev/api/clicks");
+        const data = await response.json();
+        document.getElementById("counter").innerText = data.clicks;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des clics :", error);
+      }
+    }
+
+    window.onload = () => {
+      setTimeout(updateCounter, 2000);
+    };
+  </script>
+
+</body>
+</html>
