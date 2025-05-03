@@ -18,10 +18,11 @@
       color: #fff;
       text-align: center;
       padding: 5vh 2vw;
+      position: relative;
     }
 
     .counters {
-     font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       display: flex;
       justify-content: center;
       gap: 20px;
@@ -29,31 +30,36 @@
     }
 
     .counter-block {
-        font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       text-align: center;
+      position: relative;
     }
 
     .odometer {
-        font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       font-size: 10em;
       font-weight: 900;
       color: #ffffff;
     }
 
     .label {
-        font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       margin-top: 10px;
       font-size: 1rem;
       color: #ffffff;
     }
 
     #difference-block {
-        font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       margin-top: 50px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     #difference {
-        font-family: 'Roboto' !important;
+      font-family: 'Roboto' !important;
       font-size: 7em;
       color: #ffffff;
     }
@@ -61,22 +67,20 @@
 </head>
 <body>
 
-    <div class="counter-block">
-      <div id="communitrics" class="odometer">0</div>
-      <div class="label">Communitrics.com</div>
-    </div>
+  <div class="counter-block">
+    <div id="communitrics" class="odometer">0</div>
+    <div class="label">Communitrics.com</div>
   </div>
-  <p>
-    
-  </p>
+
   <div class="counters">
     <div class="counter-block">
       <div id="clicker" class="odometer">0</div>
       <div class="label">Clicker.toasted.dev</div>
     </div>
 
-  <div id="difference-block" class="counter-block">
-    <div id="difference" class="odometer">0</div>
+    <div id="difference-block" class="counter-block">
+      <div id="difference" class="odometer">0</div>
+    </div>
   </div>
 
   <!-- Odometer JS -->
