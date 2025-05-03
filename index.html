@@ -96,7 +96,7 @@
 
     async function updateCounters() {
       try {
-        const [clickerRes, communitricsRes] = await Promise.all([
+        const [clickerRes, communitricsRes] = await Promise.all([    
           fetch("https://clicker.toasted.dev/api/clicks"),
           fetch("https://api.communitrics.com/counter")
         ]);
@@ -117,8 +117,16 @@
       }
     }
 
-    updateCounters();
-    setInterval(updateCounters, 2000);
+    // Initialisation des compteurs avec un 0
+    clickerElem.innerText = '0';
+    communitricsElem.innerText = '0';
+    differenceElem.innerText = '0';
+
+    // Délai de 10 secondes avant la mise à jour des compteurs
+    setTimeout(() => {
+      updateCounters();
+      setInterval(updateCounters, 2000);  // Mise à jour toutes les 2 secondes
+    }, 5000);  // Délai de 10 secondes avant de commencer à mettre à jour
   </script>
 
 </body>
