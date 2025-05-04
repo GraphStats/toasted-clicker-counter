@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Comparateur de compteurs</title>
 
-  <!-- Roboto Black -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
-
-  <!-- Odometer CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-default.min.css" />
 
   <style>
@@ -22,9 +19,11 @@
       height: 100vh;
       margin: 0;
       text-align: center;
+      position: relative;
     }
 
     .counter-container {
+      font-family: 'Roboto', sans-serif !important;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -40,6 +39,7 @@
     }
 
     .counter-block {
+      font-family: 'Roboto', sans-serif !important;
       text-align: center;
     }
 
@@ -47,12 +47,6 @@
       font-family: 'Roboto', sans-serif !important;
       font-size: 10em;
       font-weight: 900;
-      color: #ffffff;
-    }
-
-    .label {
-      margin-top: 10px;
-      font-size: 1rem;
       color: #ffffff;
     }
 
@@ -64,11 +58,28 @@
       font-size: 7em;
       color: #ffffff;
     }
+
+    .loader {
+      border: 8px solid #333;
+      border-top: 8px solid #ffffff;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <div class="counter-container">
+  <div class="loader" id="loader"></div>
+
+  <div class="counter-container" id="counter-container" style="visibility: hidden;">
     <div class="counter-block">
       <div id="communitrics" class="odometer">0</div>
     </div>
@@ -84,17 +95,20 @@
     </div>
   </div>
 
-  <!-- Odometer JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
 
   <script>
     const clickerElem = document.getElementById("clicker");
     const communitricsElem = document.getElementById("communitrics");
     const differenceElem = document.getElementById("difference");
+    const loader = document.getElementById("loader");
+    const container = document.getElementById("counter-container");
+
+    let firstUpdateDone = false;
 
     async function updateCounters() {
       try {
-        const [clickerRes, communitricsRes] = await Promise.all([    
+        const [clickerRes, communitricsRes] = await Promise.all([
           fetch("https://clicker.toasted.dev/api/clicks"),
           fetch("https://api.communitrics.com/counter")
         ]);
@@ -106,25 +120,32 @@
         const communitricsCount = communitricsData.count || 0;
         const diff = Math.abs(clickerCount - communitricsCount);
 
+        // Déclencher les animations
         clickerElem.innerText = clickerCount;
         communitricsElem.innerText = communitricsCount;
         differenceElem.innerText = diff;
+
+        if (!firstUpdateDone) {
+          firstUpdateDone = true;
+          // Cache le loader après 5 secondes
+          setTimeout(() => {
+            loader.style.display = "none";
+            container.style.visibility = "visible";  // Affiche les compteurs
+          }, 5000); // 5 secondes avant de cacher le loader et afficher les compteurs
+        }
 
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
       }
     }
 
-    // Initialisation des compteurs avec un 0
-    clickerElem.innerText = '0';
-    communitricsElem.innerText = '0';
-    differenceElem.innerText = '0';
-
-    // Délai de 10 secondes avant la mise à jour des compteurs
-    setTimeout(() => {
-      updateCounters();
-      setInterval(updateCounters, 2000);  // Mise à jour toutes les 2 secondes
-    }, 5000);  // Délai de 10 secondes avant de commencer à mettre à jour
+    document.addEventListener("DOMContentLoaded", () => {
+      // Premier chargement avec le loader
+      setTimeout(() => {
+        updateCounters(); // appel de la première mise à jour des compteurs après 5 secondes
+        setInterval(updateCounters, 2000); // mises à jour régulières toutes les 2 secondes
+      }, 0); // Attente initiale de 5 secondes avant de commencer à récupérer les données
+    });
   </script>
 
 </body>
