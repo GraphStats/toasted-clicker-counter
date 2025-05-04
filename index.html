@@ -104,11 +104,20 @@
     const loader = document.getElementById("loader");
     const container = document.getElementById("counter-container");
 
+    let isRequestInProgress = false;  // Variable pour vérifier si une requête est en cours
     let firstUpdateDone = false;
 
+    // Fonction qui vérifie si une requête est en cours
     async function updateCounters() {
+      if (isRequestInProgress) {
+        console.log("Une requête est déjà en cours.");
+        return;  // Si une requête est en cours, ne pas envoyer une nouvelle
+      }
+
+      isRequestInProgress = true;  // Marque la requête comme en cours
+
       try {
-        const [clickerRes, communitricsRes] = await Promise.all([
+        const [clickerRes, communitricsRes] = await Promise.all([ 
           fetch("https://clicker.toasted.dev/api/clicks"),
           fetch("https://api.communitrics.com/counter")
         ]);
@@ -120,31 +129,55 @@
         const communitricsCount = communitricsData.count || 0;
         const diff = Math.abs(clickerCount - communitricsCount);
 
-        // Déclencher les animations
+        // Déclencher les animations d'odometer
         clickerElem.innerText = clickerCount;
         communitricsElem.innerText = communitricsCount;
         differenceElem.innerText = diff;
 
+        // Initialiser l'odometer après 500ms pour s'assurer de l'animation
+        setTimeout(() => {
+          new Odometer({
+            el: clickerElem,
+            value: clickerCount,
+            format: '(,ddd)',
+            theme: 'default',
+          });
+          new Odometer({
+            el: communitricsElem,
+            value: communitricsCount,
+            format: '(,ddd)',
+            theme: 'default',
+          });
+          new Odometer({
+            el: differenceElem,
+            value: diff,
+            format: '(,ddd)',
+            theme: 'default',
+          });
+        }, 500); // Délai avant de déclencher l'animation
+
         if (!firstUpdateDone) {
           firstUpdateDone = true;
-          // Cache le loader après 5 secondes
+          // Cache le loader après 5 secondes et affiche les compteurs
           setTimeout(() => {
             loader.style.display = "none";
             container.style.visibility = "visible";  // Affiche les compteurs
-          }, 10000); // 5 secondes avant de cacher le loader et afficher les compteurs
+          }, 5000); // 5 secondes avant de cacher le loader et afficher les compteurs
         }
 
       } catch (error) {
         console.error("Erreur lors de la récupération des données :", error);
+      } finally {
+        isRequestInProgress = false;  // Marque la requête comme terminée
       }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       // Premier chargement avec le loader
       setTimeout(() => {
-        updateCounters(); // appel de la première mise à jour des compteurs après 5 secondes
-        setInterval(updateCounters, 2000); // mises à jour régulières toutes les 2 secondes
-      }, 0); // Attente initiale de 5 secondes avant de commencer à récupérer les données
+        updateCounters(); // appel de la première mise à jour des compteurs
+        setInterval(updateCounters, 3000); // mises à jour régulières toutes les 2 secondes
+      }, 0); // Démarre immédiatement après le chargement
     });
   </script>
 
